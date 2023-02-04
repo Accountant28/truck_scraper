@@ -5,11 +5,12 @@ from bs4 import BeautifulSoup
 
 import requests
 
-import itertools
 import json
 import os
 
-_id = itertools.count(1)
+import uuid
+
+PATH = '/Users/vladislav/PycharmProjects/WEBSCRAPING/trucks/data'
 
 geckodriver = '/Users/vladislav/PycharmProjects/WEBSCRAPING/07_Sneakers/geckodriver'
 driver = webdriver.Firefox(executable_path=geckodriver)
@@ -32,7 +33,7 @@ while True:
     soup = BeautifulSoup(car_link.text, 'lxml')
 
     try:
-        id = next(_id)
+        _id = int(uuid.uuid4())
         href = full_link
         title = soup.find('h1', class_ = 'sc-ellipsis sc-font-xl').text
         row_price = soup.find('h2', class_ = 'sc-highlighter-4 sc-highlighter-xl sc-font-bold').text
@@ -53,19 +54,18 @@ while True:
 
     row_image = [item.img for item in soup.find('div', class_ = 'as24-carousel__container').find_all('div', class_ = 'as24-carousel__item')]
     image_links = [item['data-src'] for item in row_image[:3]]
-    print(image_links)
-    os.makedirs(f'/Users/vladislav/PycharmProjects/WEBSCRAPING/trucks/data/{id}', exist_ok=True)
 
-    for link in image_links:
-        response = requests.get(link)
-        imagename = f'/Users/vladislav/PycharmProjects/WEBSCRAPING/trucks/data/{id}' + '/' + f'{id}.jpg'
+    os.makedirs(f'{PATH}/{_id}', exist_ok=True)
+    for image in image_links:
+        response = requests.get(image)
+        imagename = f'{PATH}/{_id}' + '/' + f'{uuid.uuid4()}.jpg'
         with open(imagename, 'wb') as file:
             file.write(response.content)
 
     data = {
         "ads": [
             {
-                "id": next(_id),
+                "id": _id,
                 "href": href,
                 "title":title,
                 "price": price,
@@ -77,7 +77,7 @@ while True:
         ]
     }
 
-    with open('data.json', 'a', encoding='utf-8') as f:
+    with open(f'{PATH}/data.json', 'a', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False)
         f.write(',')
 
