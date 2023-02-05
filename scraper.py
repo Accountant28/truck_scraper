@@ -67,12 +67,12 @@ while True:
     image_links = [item['data-src'] for item in row_images[:3]]
 
     # Create new directory for each car and save images
-    # os.makedirs(f'{PATH_FOR_SAVE}/{_id}', exist_ok=True)
-    # for image in image_links:
-    #     response = requests.get(image)
-    #     imagename = f'{PATH_FOR_SAVE}/{_id}' + '/' + f'{uuid.uuid4()}.jpg'
-    #     with open(imagename, 'wb') as file:
-    #         file.write(response.content)
+    os.makedirs(f'{PATH_FOR_SAVE}/{_id}', exist_ok=True)
+    for image in image_links:
+        response = requests.get(image)
+        imagename = f'{PATH_FOR_SAVE}/{_id}' + '/' + f'{uuid.uuid4()}.jpg'
+        with open(imagename, 'wb') as file:
+            file.write(response.content)
 
     # Write necessary data for each car in file
     data = {
