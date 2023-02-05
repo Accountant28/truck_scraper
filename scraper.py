@@ -2,6 +2,7 @@ import os
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.options import Options
 
 from bs4 import BeautifulSoup
 
@@ -11,8 +12,11 @@ import uuid
 
 PATH_FOR_SAVE = '/Users/vladislav/PycharmProjects/WEBSCRAPING/trucks/data'
 
+options = Options()
+options.headless = True
+
 geckodriver = '/Users/vladislav/PycharmProjects/WEBSCRAPING/07_Sneakers/geckodriver'
-driver = webdriver.Firefox(executable_path=geckodriver)
+driver = webdriver.Firefox(options=options, executable_path=geckodriver)
 
 driver.get('https://www.truckscout24.de/transporter/gebraucht/kuehl-iso-frischdienst/renault')
 
@@ -28,7 +32,7 @@ pagination_links = [item['href'] for item in row_pagination_links]
 
 # Main while-loop for parse
 while True:
-    # Get each first car's link
+    # Get each first car's link in each page
     short_link = soup.find('a', {'data-item-name': 'detail-page-link'})['href']
     full_link = 'https://www.truckscout24.de/' + short_link
 
