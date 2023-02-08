@@ -6,6 +6,7 @@ from selenium.webdriver.firefox.options import Options
 
 from bs4 import BeautifulSoup
 
+import time
 import requests
 import json
 import uuid
@@ -19,6 +20,8 @@ geckodriver = '/Users/vladislav/PycharmProjects/WEBSCRAPING/07_Sneakers/geckodri
 driver = webdriver.Firefox(options=options, executable_path=geckodriver)
 
 driver.get('https://www.truckscout24.de/transporter/gebraucht/kuehl-iso-frischdienst/renault')
+
+time.sleep(3)
 
 # Get rid of cookie
 cookie = driver.find_element(By.XPATH, '//*[@id="consent-mgmt-accept-all"]')
@@ -44,25 +47,34 @@ while True:
         _id = int(uuid.uuid4())
         href = full_link
         title = soup.find('h1', class_ = 'sc-ellipsis sc-font-xl').text
-
-        row_price = soup.find('h2', class_ = 'sc-highlighter-4 sc-highlighter-xl sc-font-bold').text
-        price = int(row_price.replace('€ ', '').replace('.', '').replace(',-', ''))
-
-        for item in soup.find('div', class_ = 'data-basic1').find_all('div', class_ = 'itemlbl'):
-            if item.text == 'Kilometer':
-                row_mileage = item.find_next_sibling('div').text
-                mileage = int(row_mileage.replace('.', '').replace(' km', ''))
-
-        for item in soup.find('ul', class_ = 'columns').find_all('div', class_ = 'sc-font-bold'):
-            if item.text == 'Farbe':
-                color = item.find_next_sibling('div').text
-
-        for item in soup.find('ul', class_ = 'columns').find_all('div', class_ = 'sc-font-bold'):
-            if item.text == 'Leistung':
-                power = int(item.find_next_sibling('div').text[:3])
-
-        row_description = soup.find('div', {'data-type': 'description'}).find('p').text
-        description = row_description.replace('\r\n', '').replace('\u00A0', ' ')
+        try:
+            row_price = soup.find('h2', class_ = 'sc-highlighter-4 sc-highlighter-xl sc-font-bold').text
+            price = int(row_price.replace('€ ', '').replace('.', '').replace(',-', ''))
+        except:
+            price = 0
+        try:
+            for item in soup.find('div', class_ = 'data-basic1').find_all('div', class_ = 'itemlbl'):
+                if item.text == 'Kilometer':
+                    mileage = int(item.find_next_sibling('div').text.replace('.', '').replace(' km', ''))
+        except:
+            mileage = 0
+        try:
+            for item in soup.find('ul', class_ = 'columns').find_all('div', class_ = 'sc-font-bold'):
+                if item.text == 'Farbe':
+                    color = item.find_next_sibling('div').text
+        except:
+            color = ''
+        try:
+            for item in soup.find('ul', class_ = 'columns').find_all('div', class_ = 'sc-font-bold'):
+                if item.text == 'Leistung':
+                    power = int(item.find_next_sibling('div').text[:3])
+        except:
+            power = 0
+        try:
+            row_description = soup.find('div', {'data-type': 'description'}).text
+            description = row_description.replace('\r', '').replace('\n', '')
+        except:
+            description = ''
     except:
         pass
 
@@ -96,8 +108,7 @@ while True:
 
     with open(f'{PATH_FOR_SAVE}/data.json', 'a', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False)
-        f.write(',')
-        f.write('\n')
+        f.write(',' + '\n')
 
     # Pagenate through each page
     for link in pagination_links:
