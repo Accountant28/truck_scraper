@@ -1,4 +1,5 @@
 import os
+from decouple import config
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -12,12 +13,12 @@ import uuid
 from collections import deque
 
 
-PATH_FOR_SAVE = '/Users/vladislav/PycharmProjects/WEBSCRAPING/trucks/data'
+PATH_FOR_SAVE = config('PATH_FOR_SAVE')
 
 options = Options()
 options.headless = True
 
-geckodriver = '/Users/vladislav/PycharmProjects/WEBSCRAPING/07_Sneakers/geckodriver'
+geckodriver = config('GECODRIVER') + 'geckodriver'
 driver = webdriver.Firefox(options=options, executable_path=geckodriver)
 
 PAGE = 'https://www.truckscout24.de/transporter/gebraucht/kuehl-iso-frischdienst/renault'
@@ -33,7 +34,6 @@ def parsing_site(start_page):
         info += get_info(get_html(page))
         normilize_data(info)
         get_images(get_html(page))
-
 
 def get_html(url):
     """
