@@ -2,4 +2,4 @@ selenium
 beautifulsoup4
 requests
 json
-decouple
+python-decouple
